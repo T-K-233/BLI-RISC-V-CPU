@@ -23,12 +23,12 @@ module ifu (
 
   assign next_pc = (ifu_i_is_jump | ifu_i_is_branch_taken) ? ifu_i_pc_target : (ifu_o_pc + 'h04);
 
-  register_rst_en #(.N(32)) u_program_counter (
-    .clk(clk),
-    .rst(rst),
-    .en(!ifu_i_halt),
-    .d(next_pc),
-    .q(ifu_o_pc)
+  DFF_REG_RCE #(.N(32)) u_program_counter (
+    .C(clk),
+    .R(rst),
+    .CE(!ifu_i_halt),
+    .D(next_pc),
+    .Q(ifu_o_pc)
   );
 
 endmodule

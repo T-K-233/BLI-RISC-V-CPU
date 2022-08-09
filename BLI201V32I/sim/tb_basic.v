@@ -16,8 +16,6 @@ module tb_basic();
     .CLK100MHZ(clk),
     .ck_rst(rst),
     
-    .uart_rxd_out(),
-    .uart_txd_in(),
     
     .sw(),
     .led(),

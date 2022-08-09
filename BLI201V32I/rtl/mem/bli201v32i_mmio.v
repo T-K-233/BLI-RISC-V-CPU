@@ -1,9 +1,5 @@
 
-module mmio #(
-  parameter ROM_ADDR_BITS = 12,
-  parameter IMEM_HEX = "",
-  parameter IMEM_BIN = ""
-) (
+module mmio (
   input  clk,
   input  rst,
   input  [31:0] mmio_i_addr,
@@ -22,6 +18,10 @@ module mmio #(
   wire [31:0] gpio_idr_rdata;
   wire [31:0] gpio_odr_rdata;
   
+  wire wen;
+  
+  assign wen = mmio_i_wmask !== 'b0000;
+  
   assign is_gpio_idr = mmio_i_addr === 'h0000_0000;
   assign is_gpio_odr = mmio_i_addr === 'h0000_0004;
    
@@ -32,18 +32,18 @@ module mmio #(
   
   assign mmio_o_gpio_led = gpio_odr_rdata[3:0];
   
-  register #(.N(32)) u_gpio_idr (
-    .clk(clk),
-    .d({16'h0, mmio_o_gpio_sw, mmio_o_gpio_btn}),
-    .q(gpio_idr_rdata)
+  DFF_REG #(.N(32)) u_gpio_idr (
+    .C(clk),
+    .D({24'h0, mmio_o_gpio_sw, mmio_o_gpio_btn}),
+    .Q(gpio_idr_rdata)
   );
   
-  register_rst_en #(.N(32)) u_gpio_odr (
-    .clk(clk),
-    .rst(rst),
-    .en(is_gpio_odr),
-    .d(mmio_i_wdata),
-    .q(gpio_odr_rdata)
+  DFF_REG_RCE #(.N(32)) u_gpio_odr (
+    .C(clk),
+    .R(rst),
+    .CE(is_gpio_odr & wen),
+    .D(mmio_i_wdata),
+    .Q(gpio_odr_rdata)
   );
 
 endmodule

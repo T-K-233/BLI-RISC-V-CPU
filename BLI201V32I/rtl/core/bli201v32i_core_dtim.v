@@ -1,6 +1,7 @@
 
 module dtim (
   input  clk,
+  input  rst,
   input  [11:0] dtim_i_addr,
   input  [3:0]  dtim_i_wmask,
   input  [31:0] dtim_i_wdata,
